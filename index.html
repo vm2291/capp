@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LOOGOO — Courses</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f7f8;
+    --panel:#ffffff;
+    --ink:#14171a;
+    --muted:#6b7280;
+    --line:#e6e8eb;
+    --brand:#ff8a3d;     /* orange accents */
+    --brand-dark:#ea772c;
+    --accent:#0ea45a;    /* green check */
+    --nav:#ffffff;
+    --tag:#f2f3f5;
+    --caption:#1f2937;
+    --caption-bg:rgba(15,23,42,.88);
+    --chip:#f3f4f6;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg);
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+  }
+
+  /* top nav */
+  .nav{
+    position:sticky; top:0; z-index:10;
+    background:var(--nav); border-bottom:1px solid var(--line);
+  }
+  .nav .row{
+    max-width:1200px; margin:0 auto; height:64px;
+    display:grid; grid-template-columns:220px 1fr 180px; align-items:center; gap:16px; padding:0 16px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.2px}
+  .brand .dot{width:10px;height:10px;border-radius:50%; background:var(--brand)}
+  .brand .logo{
+    width:26px;height:26px;border-radius:6px;background:var(--brand);
+    display:grid;place-items:center;color:#fff;font-weight:800
+  }
+  .brand span{font-size:20px}
+  .tabs{display:flex; gap:28px; align-items:center; justify-content:center}
+  .tab{display:flex; gap:8px; align-items:center; font-weight:500; color:var(--muted)}
+  .tab.active{color:var(--ink); position:relative}
+  .tab.active:after{content:""; position:absolute; left:0; right:0; bottom:-18px; height:3px; background:var(--brand); border-radius:2px}
+  .user{display:flex; justify-content:flex-end; align-items:center; gap:10px; color:var(--ink)}
+  .avatar{width:28px;height:28px;border-radius:50%; background:#d1d5db}
+
+  /* page grid */
+  .wrap{max-width:1200px; margin:20px auto; padding:0 16px}
+  .grid{display:grid; grid-template-columns:280px 1fr; gap:24px}
+
+  /* sidebar */
+  .side{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px;
+    height:fit-content
+  }
+  .unitHead{display:flex; justify-content:space-between; color:var(--muted); font-weight:600; margin-bottom:14px}
+  .secTitle{margin:18px 0 10px; color:var(--muted); font-weight:600}
+  .list{display:flex; flex-direction:column; gap:10px}
+  .item{
+    border:1px solid var(--line); background:#fff; border-radius:12px; padding:12px 12px;
+    display:grid; grid-template-columns:26px 1fr auto; align-items:center; gap:10px;
+  }
+  .item .icon{
+    width:20px;height:20px;border-radius:50%; border:2px solid var(--line); display:grid;place-items:center; color:#fff; font-size:12px;
+  }
+  .item.done .icon{background:var(--accent); border-color:var(--accent)}
+  .item.done .icon svg{transform:translateY(0.5px)}
+  .item .txt{line-height:1.25}
+  .item .title{font-weight:600; font-size:13px}
+  .item .sub{color:var(--muted); font-size:12px}
+  .item .dur{color:var(--muted); font-size:12px}
+  .item.sel{outline:2px solid var(--brand); background:#fff7f2}
+  .badge{
+    grid-column:1 / 4; justify-self:flex-start; margin-top:6px;
+    display:inline-flex; align-items:center; gap:6px; background:var(--chip); color:#111827; font-weight:700; font-size:12px; padding:4px 8px; border-radius:999px
+  }
+  .badge .ring{width:16px;height:16px;border:2px solid #e5e7eb;border-radius:50%; position:relative}
+  .badge .ring:after{content:""; position:absolute; inset:3px; background:var(--brand); border-radius:50%}
+
+  /* main */
+  .main{display:flex; flex-direction:column; gap:18px}
+  .courseTitle{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px 18px 0 18px
+  }
+  .courseTitle h1{margin:0; font-size:24px}
+  .courseTitle .sub{margin-top:4px; color:var(--muted)}
+  .videoCard{
+    margin-top:16px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px;
+  }
+  .videoHead{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px}
+  .provider{display:flex; align-items:center; gap:10px}
+  .provider .thumb{width:34px;height:34px;border-radius:50%; background:#d1d5db}
+  .provider .name{font-weight:600}
+  .ytbtn{
+    background:#ff0000; color:#fff; border:none; border-radius:10px; padding:6px 10px; font-weight:700;
+    display:flex; align-items:center; gap:6px; cursor:pointer
+  }
+  .player{
+    position:relative; border-radius:12px; overflow:hidden; background:#000; height:420px;
+    display:grid; place-items:center;
+  }
+  .player .poster{
+    position:absolute; inset:0; background:
+      radial-gradient(1200px 420px at 60% -20%, rgba(255,255,255,.15), transparent 40%),
+      url('') center/cover no-repeat;
+    opacity:.35;
+  }
+  .play{
+    width:78px;height:78px;border-radius:50%; background:rgba(255,255,255,.9);
+    display:grid;place-items:center; z-index:2; box-shadow:0 8px 18px rgba(0,0,0,.25)
+  }
+  .play svg{margin-left:4px}
+  .progressBar{
+    position:absolute; left:0; right:0; bottom:0; height:8px; background:#e5e7eb;
+  }
+  .progressBar:after{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:26%;
+    background:var(--brand);
+  }
+  .caption{
+    position:absolute; left:50%; transform:translateX(-50%); bottom:56px;
+    background:var(--caption-bg); color:#fff; font-weight:700; padding:10px 14px; border-radius:6px;
+    font-size:16px; z-index:2; white-space:nowrap;
+  }
+
+  .courseBody{
+    margin-top:16px; background:var(--panel); border:1px solid var(--line);
+    border-radius:14px; padding:16px;
+  }
+  .courseBody h3{margin:0 0 10px 0; font-size:16px; color:var(--muted); font-weight:600}
+  .bullets{margin:0; padding-left:18px; color:#374151}
+  .bullets li{margin:6px 0}
+
+  .actions{
+    display:flex; justify-content:flex-end; gap:12px; margin-top:16px;
+  }
+  .btn{
+    border:1px solid var(--line); background:#fff; border-radius:10px; padding:10px 16px; font-weight:600; cursor:pointer;
+  }
+  .btn.primary{
+    background:var(--brand); color:#fff; border-color:var(--brand-dark)
+  }
+  .btn.primary:active{transform:translateY(1px)}
+  .btn:active{transform:translateY(1px)}
+
+  /* icons */
+  .i{
+    width:16px;height:16px;display:inline-block;vertical-align:-3px
+  }
+
+  @media (max-width:980px){
+    .grid{grid-template-columns:1fr}
+    .side{order:2}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="row">
+    <div class="brand">
+      <div class="logo">L</div>
+      <span>LOOGOO</span>
+    </div>
+    <nav class="tabs">
+      <div class="tab"><span class="i">🏠</span> Home</div>
+      <div class="tab active"><span class="i">📚</span> Courses</div>
+      <div class="tab"><span class="i">🎧</span> Live Sessions</div>
+      <div class="tab"><span class="i">👥</span> Community</div>
+      <div class="tab"><span class="i">📘</span> Resources</div>
+    </nav>
+    <div class="user">
+      <div class="avatar"></div>
+      <div>Lorem Ipsum</div>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE -->
+<div class="wrap">
+  <div class="grid">
+    <!-- SIDEBAR -->
+    <aside class="side">
+      <div class="unitHead">
+        <div>Unit 1</div>
+        <div>34 mins</div>
+      </div>
+
+      <div class="secTitle">Sign Language Basics</div>
+      <div class="list">
+        <div class="item done">
+          <div class="icon">
+            <!-- check -->
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M20.285 6.709l-11.025 11.025-5.545-5.545 1.414-1.414 4.131 4.131 9.611-9.611z"/></svg>
+          </div>
+          <div class="txt">
+            <div class="title">Lesson 1:  Culture: What You Need to Know</div>
+          </div>
+          <div class="dur">6m 38s</div>
+        </div>
+
+        <div class="item done">
+          <div class="icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M20.285 6.709l-11.025 11.025-5.545-5.545 1.414-1.414 4.131 4.131 9.611-9.611z"/></svg>
+          </div>
+          <div class="txt">
+            <div class="title">Lesson 2:  Everyday Greetings for Meeting</div>
+          </div>
+          <div class="dur">4m 18s</div>
+        </div>
+
+        <div class="item done">
+          <div class="icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M20.285 6.709l-11.025 11.025-5.545-5.545 1.414-1.414 4.131 4.131 9.611-9.611z"/></svg>
+          </div>
+          <div class="txt">
+            <div class="title">Practice 1:  Sign Common Greetings</div>
+          </div>
+          <div class="dur">6m 15s</div>
+        </div>
+
+        <div class="secTitle">Activity: Sign With Your child</div>
+
+        <div class="item done">
+          <div class="icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M20.285 6.709l-11.025 11.025-5.545-5.545 1.414-1.414 4.131 4.131 9.611-9.611z"/></svg>
+          </div>
+          <div class="txt">
+            <div class="title">Activity 1:  Greet your child in ASL</div>
+          </div>
+          <div class="dur">8m</div>
+        </div>
+
+        <div class="item done">
+          <div class="icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M20.285 6.709l-11.025 11.025-5.545-5.545 1.414-1.414 4.131 4.131 9.611-9.611z"/></svg>
+          </div>
+          <div class="txt">
+            <div class="title">Reflection:  How did it go?</div>
+          </div>
+          <div class="dur">5m</div>
+        </div>
+
+        <div class="secTitle">Days & Time</div>
+
+        <div class="item sel">
+          <div class="icon"></div>
+          <div class="txt">
+            <div class="title">Lesson 3:  Days of the Week and Time Signs</div>
+            <div class="sub"> </div>
+          </div>
+          <div class="dur">1m 38s</div>
+          <div class="badge">
+            <span class="ring"></span>
+            <span>75%</span>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="icon"></div>
+          <div class="txt">
+            <div class="title">Practice 2:  Your turn to Sign Days of the Week</div>
+          </div>
+          <div class="dur">2m 38s</div>
+        </div>
+
+        <div class="item">
+          <div class="icon"></div>
+          <div class="txt">
+            <div class="title">Lesson 4:  Placeholder text placeholder text</div>
+          </div>
+          <div class="dur">4m 18s</div>
+        </div>
+
+        <div class="item">
+          <div class="icon"></div>
+          <div class="txt">
+            <div class="title">Practice 3:  Placeholder text placeholder text</div>
+          </div>
+          <div class="dur">6m 15s</div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <section class="courseTitle">
+        <h1>Days of the Week and Time Signs</h1>
+        <div class="sub">Lesson 3: How to sign daily time-related concepts</div>
+
+        <div class="videoCard">
+          <div class="videoHead">
+            <div class="provider">
+              <div class="thumb"></div>
+              <div>
+                <div class="name">Sign Duo</div>
+                <div class="sub" style="margin-top:2px">ASL Instructor</div>
+              </div>
+            </div>
+            <button class="ytbtn" type="button" title="YouTube">
+              <!-- play icon -->
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M19.615 3.184c1.81.485 3.205 1.88 3.69 3.69.696 2.591.696 8.003.696 8.003s0 5.412-.696 8.003a5.012 5.012 0 0 1-3.69 3.69C17.024 27 12 27 12 27s-5.024 0-7.615-.43a5.012 5.012 0 0 1-3.69-3.69C0 20.289 0 14.877 0 14.877s0-5.412.695-8.003a5.012 5.012 0 0 1 3.69-3.69C7.0-.249 12 0 12 0s5.024 0 7.615.43zM9.75 7.5v9l7.5-4.5-7.5-4.5z"/></svg>
+              <span style="font-weight:700">YouTube</span>
+            </button>
+          </div>
+
+          <div class="player" role="region" aria-label="Video player mock">
+            <div class="poster" aria-hidden="true"></div>
+            <div class="play" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#333"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div class="caption">monday, wednesday, thursday, friday, saturday, sunday</div>
+            <div class="progressBar"></div>
+          </div>
+
+          <div class="courseBody">
+            <h3>Course Content</h3>
+            <ul class="bullets">
+              <li>This video shows you how to sign each day of the week.</li>
+              <li>Watch closely and try copying each sign as you go.</li>
+              <li>In the next step you’ll practice signing all the days using the motion detection feature which will give you feedback until you sign all of them correctly.</li>
+            </ul>
+
+            <div class="actions">
+              <button class="btn" type="button">Pervious Session</button>
+              <button class="btn primary" type="button">Practice</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+  </div>
+</div>
+
+<script>
+  // Optional: tiny click feedback for the mock buttons
+  document.querySelectorAll('.btn, .ytbtn, .tab').forEach(el=>{
+    el.addEventListener('click', ()=> el.classList.add('clicked'));
+  });
+</script>
+</body>
+</html>
